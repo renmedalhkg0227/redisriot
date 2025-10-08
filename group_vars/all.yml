@@ -1,0 +1,10 @@
+---
+check_scripts:
+  yvpvmnpredisriot01: /home/vi/jk/chkDockerService_catengine.sh
+  yvpvmnpredisriot02: /home/vi/jk/chkDockerService_u3.sh
+  yvpvmnpredisriot03: /home/vi/jk/chkDockerService_datacacheapi.sh
+
+restart_scripts:
+  yvpvmnpredisriot01: sh /home/vi/riot/eks/eks-catengine-riot.sh
+  yvpvmnpredisriot02: sh /home/vi/riot/eks/eks-u3-riot.sh
+  yvpvmnpredisriot03: sh /home/vi/riot/eks/eks-datacacheapi-riot.sh
