@@ -1,0 +1,39 @@
+---
+- name: Monitor and restart Docker services if needed
+  hosts: riot_vms
+  gather_facts: no
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: Run the check script
+      shell: "{{ check_scripts[inventory_hostname] }}"
+      register: check_result
+      ignore_errors: yes
+
+    - name: Debug check result
+      debug:
+        msg: "Check script returned {{ check_result.rc }}"
+
+    - name: Restart service if check failed (rc 1 or 2)
+      shell: "{{ restart_scripts[inventory_hostname] }}"
+      when: check_result.rc in [1, 2]
+      register: restart_result
+      ignore_errors: yes
+
+    - name: Wait for 30 seconds after restart
+      pause:
+        seconds: 30
+      when: check_result.rc in [1, 2]
+
+    - name: Re-run the check script after restart
+      shell: "{{ check_scripts[inventory_hostname] }}"
+      register: recheck_result
+      when: check_result.rc in [1, 2]
+      ignore_errors: yes
+
+    - name: Report final status
+      debug:
+        msg: >
+          "Initial check: {{ check_result.rc }},
+          After restart: {{ recheck_result.rc | default('N/A') }}"
